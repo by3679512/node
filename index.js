@@ -1,7 +1,21 @@
+// 引入express模块 --> 用来快速开发接口
 const express = require('express');
-// const bodyParser = require('body-parser');
-const app = express();
-const fs = require("fs-then")
+const app = express()
+// 引入cors模块 --> 用来解决跨域的
+const cors = require('cors')
+// 引入封装好promise的fs-then模块
+const fs = require('fs-then')
+// 引入修改编码格式的body-parser模块 --> 要先下载  body-parser模块名字
+const bodyParser = require('body-parser')
+
+// 设置express 支持post请求参数格式支持json   支持application/json
+app.use(bodyParser.json());
+
+// 设置 express 支持 post请求参数 默认是application/x-www-form-urlencoded编码格式  app.use(express.urlencoded());
+app.use(express.urlencoded())
+
+// 解决跨域问题
+app.use(cors())
 
 // 获取所有书本
 app.get('/api/getbooks', async (req, res) => {
@@ -28,10 +42,6 @@ app.get('/api/onebook', async (req, res) => {
         res.send({ status: 0, message: '获取图书失败' })
     }
 })
-
-
-// 配置，接收请求体
-app.use(express.urlencoded({ extended: true })); // 接收查询字符串格式请求体
 
 app.post('/api/addbook', async (req, res) => {
     // 先获取数据
@@ -72,6 +82,7 @@ if (index == -1) {
 }
 })
 
+// 删除图书
 app.delete('/api/delbook', async (req, res) => {
     // 先获取数据
     let data = await fs.readFile('./data.json', 'utf-8')

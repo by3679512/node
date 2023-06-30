@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>编辑页面</h1>
+    <div class="main">
+        <div>
+            <label for="">书名</label> <input class="bookname" type="text" />
+        </div>
+        <div><label for="">作者</label> <input class="author" type="text" /></div>
+        <div>
+            <label for="">出版社</label> <input class="publisher" type="text" />
+        </div>
+        <div>
+            <button>编辑</button>
+        </div>
+    </div>
+    <script src="./js/axios.js"></script>
+    <script>
+        // 先把传过来的id获取到--> 使用location.search方法可以获取到连接到后面的字符串参数，不知道方法可以直接打印location
+        const data = location.search
+        const id = data.split('=')[data.split('=').length - 1]
+        // console.log(id);
+        axios({
+            url: 'http://127.0.0.1:3000/api/onebook',
+            params: {
+                id
+            }
+        }).then(res => {
+            let list = res.data.data
+            const bookname = document.querySelector('.bookname')
+            const author = document.querySelector('.author')
+            const publisher = document.querySelector('.publisher')
+
+            // console.log(bookname, author, publisher, list);
+
+            bookname.value = list.bookname
+            author.value = list.author
+            publisher.value = list.publisher
+
+            document.querySelector('button').addEventListener('click', function () {
+                axios({
+                    method: 'put',
+                    url: 'http://127.0.0.1:3000/api/updatebook',
+                    data: {
+                        id,
+                        bookname: bookname.value,
+                        author: author.value,
+                        publisher: publisher.value,
+                    }
+                }).then(res => {
+                    // console.log(res);
+                    if (res.data.status == 0) {
+                        alert(res.data.message);
+                        location.href = './list.html'
+                    } else {
+                        alert('修改图书失败');
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+
+</html>
