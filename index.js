@@ -49,6 +49,50 @@ app.post('/api/addbook', async (req, res) => {
 })
 
 
+// 修改图书
+app.put('/api/updatebook', async (req, res) => {
+    // 先获取数据
+    let data = await fs.readFile('./data.json', 'utf-8')
+    // 然后把数据转换成数组
+    data = JSON.parse(data)
+    // 修改一样是根据id来修改，所以要先获取id
+   const index = data.findIndex(function (item) {
+    // 判断请求参数中的id和数据中的id相同的数据是第几个  
+    return req.body.id == item.id
+})
+    // 如果上面的索引找不到，会返回-1，需要进行个判断
+if (index == -1) {
+    res.send({ status: 1, message: 'id不存在' })
+} else {
+    // 把对应索引的数据改成传进来的参数
+    data[index] = req.body
+    // 把新数据覆盖之前的数据
+    await fs.writeFile('./data.json', JSON.stringify(data))
+    res.send({ status: 0, message: '修改图书成功' })
+}
+})
+
+app.delete('/api/delbook', async (req, res) => {
+    // 先获取数据
+    let data = await fs.readFile('./data.json', 'utf-8')
+    // 然后把数据转换成数组
+    data = JSON.parse(data)
+    // 删除一样是根据id来删除，所以要先获取id
+    const index = data.findIndex(function (item) {
+        // 判断请求参数中的id和数据中的id相同的数据是第几个
+        return req.query.id == item.id
+    })
+    // 用splice删除对应数据
+    data.splice(index, 1)
+
+    // 把新数据覆盖之前的数据
+    await fs.writeFile('./data.json', JSON.stringify(data))
+
+    // 响应
+    res.send({ status: 0, message: '删除图书成功' })
+})
+
+
 app.listen(3000, () => {
     console.log('Express服务器已启动，监听端口3000');
 });
